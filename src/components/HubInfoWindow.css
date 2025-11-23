@@ -1,0 +1,48 @@
+.hub-info-window {
+  position: absolute;
+  background-color: rgba(30, 30, 30, 0.9);
+  color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  max-width: 300px;
+  z-index: 1000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+}
+
+.hub-info-window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.hub-info-window-header h2 {
+  margin: 0;
+  color: #ffa500;
+  font-size: 1.2em;
+}
+
+.hub-info-window-header button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.hub-info-window-header button:hover {
+  color: #ffa500;
+}
+
+.hub-info-window-content p {
+  margin-bottom: 5px;
+  font-size: 0.9em;
+}
+
+

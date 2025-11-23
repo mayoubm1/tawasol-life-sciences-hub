@@ -1,0 +1,14 @@
+# dependencies
+/node_modules
+/.pnpm-store
+
+# build output
+/dist
+/build
+
+# misc
+.DS_Store
+.env
+.env.local
+.vscode
+pnpm-lock.yaml
