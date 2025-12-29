@@ -6,10 +6,10 @@ import HubInfoWindow from './components/HubInfoWindow';
 import './App.css';
 
 function GlobeComponent() {
-    const globeEl = useRef();
-    const [countries, setCountries] = useState({ features: [] });
-    const [hoverD, setHoverD] = useState();
-    const [activeHub, setActiveHub] = useState(null); // State to manage active hub for info window
+  const globeEl = useRef();
+  const [countries, setCountries] = useState({ features: [] });
+  const [hoverD, setHoverD] = useState();
+  const [activeHub, setActiveHub] = useState(null); // State to manage active hub for info window
   const navigate = useNavigate();
 
   const hubs = [
@@ -34,93 +34,93 @@ function GlobeComponent() {
     { lat: 41.3851, lng: 2.1734, name: 'Barcelona, Spain', id: 'barcelona', description: 'A vibrant biotech and life sciences cluster with strong academic institutions and research centers. Growing investment in genomics and personalized medicine. Specializations: Genomics, Personalized Medicine, Biotech Innovation.' },
     { lat: 45.4642, lng: 9.1900, name: 'Milan, Italy', id: 'milan', description: 'A growing life sciences hub with strong pharmaceutical and biotech presence. Focus on regenerative medicine and advanced therapies. Specializations: Regenerative Medicine, Advanced Therapies, Pharmaceutical Research.' },
     { lat: -33.8688, lng: 151.2093, name: 'Sydney, Australia', id: 'sydney', description: 'A leading biotech hub in the Asia-Pacific region with strong government support and research institutions. Growing focus on medical devices and diagnostics. Specializations: Medical Devices, Diagnostics, Biotech Innovation.' },
-    { lat: -37.8136, lng: 144.9631, name: 'Melbourne, Australia', id: 'melbourne', description: 'A prominent Australian life sciences hub with strong pharmaceutical and biotech sectors. Home to leading research institutions and innovation clusters. Specializations: Immunotherapy, Regenerative Medicine, Biotech Research.' },
+    { lat: 37.7749, lng: 144.9628, name: 'Melbourne, Australia', id: 'melbourne', description: 'A prominent Australian life sciences hub with strong pharmaceutical and biotech sectors. Home to leading research institutions and innovation clusters. Specializations: Immunotherapy, Regenerative Medicine, Biotech Research.' },
     { lat: -34.6037, lng: -58.3816, name: 'Buenos Aires, Argentina', id: 'buenos_aires', description: 'An emerging Latin American biotech hub with growing investment in life sciences. Strong focus on translational research and pharmaceutical development. Specializations: Pharmaceutical Development, Translational Research, Biotech Innovation.' },
     { lat: -23.5505, lng: -46.6333, name: 'São Paulo, Brazil', id: 'sao_paulo', description: 'The largest biotech hub in Latin America with strong pharmaceutical and biotech sectors. Growing investment in personalized medicine and digital health. Specializations: Personalized Medicine, Digital Health, Pharmaceutical Research.' },
     { lat: 37.3382, lng: -121.8863, name: 'San Jose, USA', id: 'san_jose', description: 'A major tech and biotech hub in Silicon Valley with strong focus on AI/ML applications in healthcare and medical devices. Specializations: AI/ML Healthcare, Medical Devices, Digital Health Innovation.' },
-      ];
+  ];
 
   const cairoHub = hubs.find(hub => hub.id === 'cairo');
-    const arcsData = cairoHub ? hubs.filter(hub => hub.id !== 'cairo').map(hub => ({
-          startLat: cairoHub.lat,
-          startLng: cairoHub.lng,
-          endLat: hub.lat,
-          endLng: hub.lng,
-          color: [['#00FF00'], ['#FFFF00'], ['#FF0000']][Math.floor(Math.random() * 3)],
-    })) : [];
+  const arcsData = cairoHub ? hubs.filter(hub => hub.id !== 'cairo').map(hub => ({
+    startLat: cairoHub.lat,
+    startLng: cairoHub.lng,
+    endLat: hub.lat,
+    endLng: hub.lng,
+    color: [['#00FF00'], ['#FFFF00'], ['#FF0000']][Math.floor(Math.random() * 3)],
+  })) : [];
 
   useEffect(() => {
-        if (globeEl.current) {
-                globeEl.current.controls().autoRotate = true;
-                globeEl.current.controls().autoRotateSpeed = 0.5;
-        }
+    if (globeEl.current) {
+      globeEl.current.controls().autoRotate = true;
+      globeEl.current.controls().autoRotateSpeed = 0.5;
+    }
 
-                fetch('/ne_110m_admin_0_countries.geojson')
-          .then(res => res.json())
-          .then(setCountries);
+    fetch('/ne_110m_admin_0_countries.geojson')
+      .then(res => res.json())
+      .then(setCountries);
   }, []);
 
   const handleGlobeClick = ({ lat, lng }) => {
-        const clickedHub = hubs.find(hub => 
-                                           Math.abs(lat - hub.lat) < 1 && Math.abs(lng - hub.lng) < 1
-                                         );
+    const clickedHub = hubs.find(hub => 
+      Math.abs(lat - hub.lat) < 1 && Math.abs(lng - hub.lng) < 1
+    );
 
-        if (clickedHub && clickedHub.name.includes('Egypt')) {
-                navigate('/egypt-hub-details');
-        } else if (clickedHub) {
-                setActiveHub(clickedHub);
-        } else {
-                window.open(`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`, '_blank');
-        }
+    if (clickedHub && clickedHub.name.includes('Egypt')) {
+      navigate('/egypt-hub-details');
+    } else if (clickedHub) {
+      setActiveHub(clickedHub);
+    } else {
+      window.open(`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`, '_blank');
+    }
   };
 
   const handleCloseInfoWindow = () => {
-        setActiveHub(null);
+    setActiveHub(null);
   };
 
   return (
-        <div className="App">
-              <Globe
-                        ref={globeEl}
-                        globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-                        backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-                        hexPolygonsData={countries.features}
-                        hexPolygonResolution={3}
-                        hexPolygonMargin={0.7}
-                        hexPolygonColor={({ properties: d }) =>
-                                    d === hoverD ? 'rgba(255,255,255, 0.8)' : 'rgba(255,255,255, 0.1)'
-                        }
-                        onHexPolygonHover={setHoverD}
-                        onGlobeClick={handleGlobeClick}
-                        labelsData={hubs}
-                        labelLat={d => d.lat}
-                        labelLng={d => d.lng}
-                        labelText={d => d.name}
-                        labelSize={0.8}
-                        labelDotRadius={0.4}
-                        labelColor={() => 'rgba(255, 165, 0, 0.75)'}
-                        labelResolution={3}
-                        labelsTransitionDuration={1000}
-                        arcsData={arcsData}
-                        arcColor={'color'}
-                        arcDashLength={0.5}
-                        arcDashGap={0.1}
-                        arcDashAnimateTime={1000}
-                        arcStroke={0.5}
-                      />
-              <HubInfoWindow hub={activeHub} onClose={handleCloseInfoWindow} />
-        </div>div>
-      );
+    <div className="App">
+      <Globe
+        ref={globeEl}
+        globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+        backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+        hexPolygonsData={countries.features}
+        hexPolygonResolution={3}
+        hexPolygonMargin={0.7}
+        hexPolygonColor={({ properties: d }) =>
+          d === hoverD ? 'rgba(255,255,255, 0.8)' : 'rgba(255,255,255, 0.1)'
+        }
+        onHexPolygonHover={setHoverD}
+        onGlobeClick={handleGlobeClick}
+        labelsData={hubs}
+        labelLat={d => d.lat}
+        labelLng={d => d.lng}
+        labelText={d => d.name}
+        labelSize={0.8}
+        labelDotRadius={0.4}
+        labelColor={() => 'rgba(255, 165, 0, 0.75)'}
+        labelResolution={3}
+        labelsTransitionDuration={1000}
+        arcsData={arcsData}
+        arcColor={'color'}
+        arcDashLength={0.5}
+        arcDashGap={0.1}
+        arcDashAnimateTime={1000}
+        arcStroke={0.5}
+      />
+      <HubInfoWindow hub={activeHub} onClose={handleCloseInfoWindow} />
+    </div>
+  );
 }
 
 function App() {
-    return (
-          <Routes>
-                <Route path="/" element={<GlobeComponent />} />
-                <Route path="/egypt-hub-details" element={<EgyptHubDetails />} />
-          </Routes>Routes>
-        );
+  return (
+    <Routes>
+      <Route path="/" element={<GlobeComponent />} />
+      <Route path="/egypt-hub-details" element={<EgyptHubDetails />} />
+    </Routes>
+  );
 }
 
 export default App;
-</div>
+
