@@ -1,15 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Globe from 'react-globe.gl';
 import EgyptHubDetails from './components/EgyptHubDetails';
 import HubInfoWindow from './components/HubInfoWindow';
+import AIAssistant from './components/AIAssistant';
 import './App.css';
 
 function GlobeComponent() {
   const globeEl = useRef();
   const [countries, setCountries] = useState({ features: [] });
   const [hoverD, setHoverD] = useState();
-  const [activeHub, setActiveHub] = useState(null); // State to manage active hub for info window
+  const [activeHub, setActiveHub] = useState(null);
+  const [showChat, setShowChat] = useState(false);
   const navigate = useNavigate();
 
   const hubs = [
@@ -34,7 +36,7 @@ function GlobeComponent() {
     { lat: 41.3851, lng: 2.1734, name: 'Barcelona, Spain', id: 'barcelona', description: 'A vibrant biotech and life sciences cluster with strong academic institutions and research centers. Growing investment in genomics and personalized medicine. Specializations: Genomics, Personalized Medicine, Biotech Innovation.' },
     { lat: 45.4642, lng: 9.1900, name: 'Milan, Italy', id: 'milan', description: 'A growing life sciences hub with strong pharmaceutical and biotech presence. Focus on regenerative medicine and advanced therapies. Specializations: Regenerative Medicine, Advanced Therapies, Pharmaceutical Research.' },
     { lat: -33.8688, lng: 151.2093, name: 'Sydney, Australia', id: 'sydney', description: 'A leading biotech hub in the Asia-Pacific region with strong government support and research institutions. Growing focus on medical devices and diagnostics. Specializations: Medical Devices, Diagnostics, Biotech Innovation.' },
-    { lat: 37.7749, lng: 144.9628, name: 'Melbourne, Australia', id: 'melbourne', description: 'A prominent Australian life sciences hub with strong pharmaceutical and biotech sectors. Home to leading research institutions and innovation clusters. Specializations: Immunotherapy, Regenerative Medicine, Biotech Research.' },
+    { lat: -37.8136, lng: 144.9631, name: 'Melbourne, Australia', id: 'melbourne', description: 'A prominent Australian life sciences hub with strong pharmaceutical and biotech sectors. Home to leading research institutions and innovation clusters. Specializations: Immunotherapy, Regenerative Medicine, Biotech Research.' },
     { lat: -34.6037, lng: -58.3816, name: 'Buenos Aires, Argentina', id: 'buenos_aires', description: 'An emerging Latin American biotech hub with growing investment in life sciences. Strong focus on translational research and pharmaceutical development. Specializations: Pharmaceutical Development, Translational Research, Biotech Innovation.' },
     { lat: -23.5505, lng: -46.6333, name: 'São Paulo, Brazil', id: 'sao_paulo', description: 'The largest biotech hub in Latin America with strong pharmaceutical and biotech sectors. Growing investment in personalized medicine and digital health. Specializations: Personalized Medicine, Digital Health, Pharmaceutical Research.' },
     { lat: 37.3382, lng: -121.8863, name: 'San Jose, USA', id: 'san_jose', description: 'A major tech and biotech hub in Silicon Valley with strong focus on AI/ML applications in healthcare and medical devices. Specializations: AI/ML Healthcare, Medical Devices, Digital Health Innovation.' },
@@ -46,7 +48,10 @@ function GlobeComponent() {
     startLng: cairoHub.lng,
     endLat: hub.lat,
     endLng: hub.lng,
-    color: [['#00FF00'], ['#FFFF00'], ['#FF0000']][Math.floor(Math.random() * 3)],
+    color: [['#00FFFF'], ['#FFFF00'], ['#FFFFFF']][Math.floor(Math.random() * 3)],
+    dashLength: 0.1,
+    dashGap: 0.4,
+    dashAnimateTime: 1000,
   })) : [];
 
   useEffect(() => {
@@ -54,23 +59,20 @@ function GlobeComponent() {
       globeEl.current.controls().autoRotate = true;
       globeEl.current.controls().autoRotateSpeed = 0.5;
     }
-
     fetch('/ne_110m_admin_0_countries.geojson')
       .then(res => res.json())
-      .then(setCountries);
+      .then(setCountries)
+      .catch(err => console.error('Error loading countries:', err));
   }, []);
 
   const handleGlobeClick = ({ lat, lng }) => {
     const clickedHub = hubs.find(hub => 
       Math.abs(lat - hub.lat) < 1 && Math.abs(lng - hub.lng) < 1
     );
-
     if (clickedHub && clickedHub.name.includes('Egypt')) {
       navigate('/egypt-hub-details');
     } else if (clickedHub) {
       setActiveHub(clickedHub);
-    } else {
-      window.open(`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`, '_blank');
     }
   };
 
@@ -79,7 +81,7 @@ function GlobeComponent() {
   };
 
   return (
-    <div className="App">
+    <div className="globe-container">
       <Globe
         ref={globeEl}
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
@@ -98,29 +100,65 @@ function GlobeComponent() {
         labelText={d => d.name}
         labelSize={0.8}
         labelDotRadius={0.4}
-        labelColor={() => 'rgba(255, 165, 0, 0.75)'}
-        labelResolution={3}
-        labelsTransitionDuration={1000}
+        labelColor={() => '#FFA500'}
         arcsData={arcsData}
-        arcColor={'color'}
-        arcDashLength={0.5}
-        arcDashGap={0.1}
-        arcDashAnimateTime={1000}
-        arcStroke={0.5}
+        arcStartLat={d => d.startLat}
+        arcStartLng={d => d.startLng}
+        arcEndLat={d => d.endLat}
+        arcEndLng={d => d.endLng}
+        arcColor={d => d.color}
+        arcDashLength={d => d.dashLength}
+        arcDashGap={d => d.dashGap}
+        arcDashAnimateTime={d => d.dashAnimateTime}
+        arcStrokeWidth={2}
       />
-      <HubInfoWindow hub={activeHub} onClose={handleCloseInfoWindow} />
+      {activeHub && (
+        <HubInfoWindow hub={activeHub} onClose={handleCloseInfoWindow} />
+      )}
+      <button 
+        className="chat-button"
+        onClick={() => setShowChat(!showChat)}
+        title="Open HAYAT AI Assistant"
+      >
+        💬
+      </button>
+      {showChat && (
+        <div className="chat-container">
+          <AIAssistant onClose={() => setShowChat(false)} />
+        </div>
+      )}
     </div>
   );
 }
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<GlobeComponent />} />
-      <Route path="/egypt-hub-details" element={<EgyptHubDetails />} />
-    </Routes>
+    <div className="app">
+      <nav className="navbar">
+        <div className="navbar-brand">
+          <div className="brand-icon">T</div>
+          <div className="brand-text">
+            <div className="brand-title">Tawasol</div>
+            <div className="brand-subtitle">Life Sciences</div>
+            <div className="brand-desc">Global Technology Hub Network</div>
+          </div>
+        </div>
+        <div className="navbar-menu">
+          <button className="nav-item">About Life Sciences</button>
+          <button className="nav-item">Research Hub</button>
+          <button className="nav-item">Innovation Lab</button>
+          <button className="nav-item">Portfolio</button>
+          <button className="nav-item active">🌍 3D Globe</button>
+          <button className="nav-item">🗺️ 2D Map</button>
+        </div>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<GlobeComponent />} />
+        <Route path="/egypt-hub-details" element={<EgyptHubDetails />} />
+      </Routes>
+    </div>
   );
 }
 
 export default App;
-
