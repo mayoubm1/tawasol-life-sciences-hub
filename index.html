@@ -1,13 +1,1476 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tawasol Life Science Hub</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAWASOL Egypt - Life Science Technology Park | Ancient Wisdom, Future Innovation</title>
+    <meta name="description" content="TAWASOL Egypt Life Science Technology Park - Awakening ancient Egyptian wisdom to lead the future of life sciences, AI, and quantum research. An 8 billion EGP mega project pioneering sustainable healthcare innovation.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+   <script>
+// YOUR REAL SUPABASE PROJECT (already correct)
+const SUPABASE_URL = "https://vrfyjirddfdnwuffzqhb.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyZnlqaXJkZGZkbnd1ZmZ6cWhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDYwNjMsImV4cCI6MjA3NTQ4MjA2M30.glgJwI2yIqUFG8ZtWJk2esxGdXw6nFp5eQ8aANbRAvE";
+const BRIDGE = "https://vrfyjirddfdnwuffzqhb.supabase.co/functions/v1/telstp-bridge-v2";
+
+async function callBridge(action, payload = {}) {
+  const res = await fetch(BRIDGE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY
+    },
+    body: JSON.stringify({ action, payload })
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Bridge error:", text);
+    alert("Error: " + text);
+    return null;
+  }
+
+  return await res.json();
+}
+
+// RUN THIS IMMEDIATELY — YOU WILL SEE YOUR REAL TABLES
+callBridge("get_tables").then(tables => {
+  console.log("REAL TABLES LOADED:", tables);
+  alert("SUCCESS! " + (tables?.length || 0) + " real tables loaded! Check console");
+}).catch(e => console.error(e));
+</script>
+
+<script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Fix for OrbitControls
+        if (typeof THREE !== 'undefined' && THREE.OrbitControls === undefined) {
+            // Fallback initialization will be handled in the main script
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Ancient Egyptian inspired color palette */
+        :root {
+            --gold: #FFD700;
+            --ancient-blue: #1E3A8A;
+            --papyrus: #F4E4BC;
+            --hieroglyph-green: #2D5016;
+            --sunset-orange: #FF6B35;
+            --night-sky: #0F172A;
+        }
+
+        /* Header Navigation */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--gold);
+        }
+
+        /* Modern UI Enhancements - Inspired by Magic UI */
+        
+        /* Animated Gradient Text */
+        .gradient-text {
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF6B35, #FFD700);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* Border Beam Effect */
+        .border-beam {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .border-beam::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #FFD700, transparent);
+            animation: borderBeam 2s linear infinite;
+        }
+        
+        @keyframes borderBeam {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        /* Particles Background */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #FFD700;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: particleFloat 6s linear infinite;
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-10vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+        
+        /* Enhanced Glass Morphism */
+        .glass-enhanced {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-enhanced:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 215, 0, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Interactive Hover Button */
+        .interactive-button {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .interactive-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .interactive-button:hover::before {
+            left: 100%;
+        }
+        
+        .interactive-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        /* Enhanced Ministry Cards */
+        .ministry-card-enhanced {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ministry-card-enhanced::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .ministry-card-enhanced:hover::before {
+            opacity: 1;
+        }
+        
+        .ministry-card-enhanced:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(255, 215, 0, 0.2);
+        }
+        
+        /* Floating Animation for Icons */
+        .floating-icon {
+            animation: floatingIcon 3s ease-in-out infinite;
+        }
+        
+        @keyframes floatingIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="hieroglyphs" patternUnits="userSpaceOnUse" width="100" height="100"><text x="20" y="30" fill="%23FFD70020" font-size="20">𓂀</text><text x="60" y="70" fill="%23FFD70020" font-size="20">𓁹</text><text x="10" y="90" fill="%23FFD70020" font-size="20">𓈖</text></pattern></defs><rect width="1000" height="1000" fill="url(%23hieroglyphs)"/></svg>');
+            background-size: cover;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--gold), var(--sunset-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--papyrus);
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--gold), var(--sunset-orange));
+            color: var(--night-sky);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Globe Container */
+        .globe-section {
+            padding: 5rem 0;
+            background: var(--night-sky);
+        }
+
+        .globe-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            color: var(--papyrus);
+            opacity: 0.8;
+        }
+
+        #globe-canvas {
+            width: 100%;
+            height: 600px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Ministry Cards */
+        .ministries-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, var(--night-sky) 0%, var(--ancient-blue) 100%);
+        }
+
+        .ministries-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+
+        .ministry-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .ministry-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .ministry-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .ministry-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+
+        .ministry-description {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* Ancient Wisdom Section */
+        .wisdom-section {
+            padding: 5rem 0;
+            background: linear-gradient(45deg, var(--hieroglyph-green) 0%, var(--night-sky) 100%);
+        }
+
+        .wisdom-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .wisdom-quote {
+            font-size: 1.8rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+            color: var(--gold);
+            position: relative;
+        }
+
+        .wisdom-quote::before,
+        .wisdom-quote::after {
+            content: '"';
+            font-size: 3rem;
+            color: var(--sunset-orange);
+            position: absolute;
+        }
+
+        .wisdom-quote::before {
+            left: -2rem;
+            top: -1rem;
+        }
+
+        .wisdom-quote::after {
+            right: -2rem;
+            bottom: -2rem;
+        }
+
+        /* Hub Link Styles */
+        .hub-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .hub-link:hover {
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+            border-color: #FFD700;
+        }
+
+        .hub-actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--night-sky);
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 2px solid var(--gold);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .ministries-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--night-sky);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hub Info Panel */
+        .hub-info-panel {
+            position: fixed;
+            right: -400px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 380px;
+            max-height: 80vh;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 15px 0 0 15px;
+            border: 2px solid var(--gold);
+            border-right: none;
+            padding: 2rem;
+            transition: right 0.5s ease;
+            z-index: 1001;
+            overflow-y: auto;
+        }
+
+        .hub-info-panel.active {
+            right: 0;
+        }
+
+        .hub-info-panel h3 {
+            color: var(--gold);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .hub-info-panel .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .hub-detail {
+            margin-bottom: 1.5rem;
+        }
+
+        .hub-detail h4 {
+            color: var(--sunset-orange);
+            margin-bottom: 0.5rem;
+        }
+
+        .hub-detail p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* Ancient Wisdom Timeline */
+        .timeline-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, var(--ancient-blue) 0%, var(--night-sky) 100%);
+        }
+
+        .timeline {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 3rem;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            flex: 1;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .timeline-date {
+            font-size: 1.2rem;
+            color: var(--gold);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.5rem;
+            color: var(--sunset-orange);
+            margin-bottom: 1rem;
+        }
+
+        .timeline-description {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .timeline-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--gold), var(--sunset-orange));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 2rem;
+            flex-shrink: 0;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced visual effects */
+        .floating-hieroglyphs {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .hieroglyph {
+            position: absolute;
+            color: rgba(255, 215, 0, 0.1);
+            font-size: 2rem;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Floating Hieroglyphs Background -->
+    <div class="floating-hieroglyphs" id="hieroglyphsContainer"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="#" class="logo">TAWASOL Egypt 𓂀</a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#globe">Global Network</a></li>
+                <li><a href="#ministries">Digital Nation</a></li>
+                <li><a href="#timeline">Ancient Wisdom</a></li>
+                <li><a href="#contact">Connect</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1 class="gradient-text morphing-text">TAWASOL Egypt</h1>
+            <p class="hero-subtitle">Life Science Technology Park</p>
+            <p class="hero-description">
+                Awakening the ancient wisdom of Egypt to lead the future of life sciences. 
+                An 8 billion EGP mega project pioneering sustainable healthcare innovation, 
+                quantum research, and AI-driven medical breakthroughs. From the land that gave 
+                humanity its first astronomical charts and medical knowledge, we rise again 
+                to illuminate the path forward.
+            </p>
+            <a href="#digital-nation" class="interactive-button border-beam">Explore Our Digital Nation</a>
+        </div>
+        <!-- Particles Background -->
+        <div class="particles-container" id="particles"></div>
+    </section>
+
+    <!-- Globe Section -->
+    <section class="globe-section" id="globe">
+        <div class="globe-container">
+            <h2 class="section-title">Global Life Science Network</h2>
+            <p class="section-subtitle">
+                Connecting ancient wisdom with modern innovation across continents
+            </p>
+            <div id="globe-canvas"></div>
+        </div>
+    </section>
+
+    <!-- Ministries Section -->
+    <section class="ministries-section" id="ministries">
+        <div class="globe-container">
+            <h2 class="section-title">Digital Nation Ministries</h2>
+            <p class="section-subtitle">
+                Eight specialized ministries governing our digital ecosystem
+            </p>
+        </div>
+        <div class="ministries-grid">
+            <div class="ministry-card ministry-card-enhanced border-beam">
+                <div class="ministry-icon floating-icon">🌍</div>
+                <h3>Foreign Affairs</h3>
+                <p>Global 3D Network connecting international partnerships and life science hubs worldwide</p>
+            </div>
+            <div class="ministry-card ministry-card-enhanced border-beam">
+                <div class="ministry-icon floating-icon">💰</div>
+                <h3>Treasury</h3>
+                <p>Investor Gateway managing 8 billion EGP investment and funding opportunities</p>
+            </div>
+            <div class="ministry-card ministry-card-enhanced border-beam">
+                <div class="ministry-icon floating-icon">🎓</div>
+                <h3>Education</h3>
+                <p>Curriculum Hub transforming 250,000 students into active researchers</p>
+            </div>
+            <div class="ministry-card ministry-card-enhanced border-beam">
+                <div class="ministry-icon floating-icon">🏥</div>
+                <h3>Health</h3>
+                <p>Telemedicine Platform with 500-bed state-of-the-art hospital complex</p>
+            </div>
+            <div class="ministry-card ministry-card-enhanced border-beam">
+                <div class="ministry-icon floating-icon">🔬</div>
+                <h3>Research</h3>
+                <p>M2-3M Research System powering quantum computing and genomics research</p>
+            </div>
+            <div class="ministry-card ministry-card-enhanced border-beam">
+                <div class="ministry-icon floating-icon">📻</div>
+                <h3>Broadcasting</h3>
+                <p>Radio/Podcasts Platform sharing knowledge and scientific discoveries</p>
+            </div>
+            <div class="ministry-card ministry-card-enhanced border-beam">
+                <div class="ministry-icon floating-icon">🏥</div>
+                <h3>Healthcare Hub</h3>
+                <p>Integrated Healthcare Services coordinating comprehensive patient care</p>
+            </div>
+            <div class="ministry-card ministry-card-enhanced border-beam">
+                <div class="ministry-icon floating-icon">🤖</div>
+                <h3>AI Platform</h3>
+                <p>OmniCognitor AI coordination and intelligent system integration</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ancient Wisdom Timeline -->
+    <section class="timeline-section" id="timeline">
+        <div class="timeline">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 3rem;">Ancient Wisdom, Modern Innovation</h2>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">1476 BCE</div>
+                    <h3 class="timeline-title">Senenmut's Astronomical Chart</h3>
+                    <p class="timeline-description">
+                        The world's first astronomical star map, recording celestial conjunctions with precision that modern science has confirmed. Senenmut, architect to Queen Hatshepsut, became history's first recorded astronomer.
+                    </p>
+                </div>
+                <div class="timeline-icon">🌟</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">1300 BCE</div>
+                    <h3 class="timeline-title">Proof of Earth's Spherical Nature</h3>
+                    <p class="timeline-description">
+                        Ancient Egyptians depicted Earth's spherical shape in Ramesses VI's tomb, showing sophisticated understanding of celestial mechanics thousands of years before other civilizations.
+                    </p>
+                </div>
+                <div class="timeline-icon">🌍</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">Ancient Era</div>
+                    <h3 class="timeline-title">The Eye of Horus - Third Eye Knowledge</h3>
+                    <p class="timeline-description">
+                        Understanding of the pineal gland as the "eye of the mind" - a concept that parallels modern neuroscience research into consciousness and perception.
+                    </p>
+                </div>
+                <div class="timeline-icon">👁️</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">2500 BCE</div>
+                    <h3 class="timeline-title">Ptahhotep's Wisdom</h3>
+                    <p class="timeline-description">
+                        The world's first book on philosophy and wisdom literature, "The Teachings of Ptahhotep," establishing foundations of ethical philosophy and moral guidance.
+                    </p>
+                </div>
+                <div class="timeline-icon">📜</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">2025 CE</div>
+                    <h3 class="timeline-title">TAWASOL Egypt - The Continuation</h3>
+                    <p class="timeline-description">
+                        Today, TAWASOL Egypt continues this legacy of discovery through quantum computing, genomics research, and AI-driven healthcare innovation, proving that Egypt's leadership in advancing human knowledge is eternal.
+                    </p>
+                </div>
+                <div class="timeline-icon">🚀</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hub Info Panel -->
+    <div class="hub-info-panel" id="hubInfoPanel">
+        <button class="close-btn" onclick="closeHubInfo()">&times;</button>
+        <div id="hubInfoContent">
+            <!-- Dynamic content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <h3 style="color: var(--gold); margin-bottom: 1rem;">TAWASOL Egypt Life Science Technology Park</h3>
+            <p>Pioneering the future of life sciences through ancient wisdom and modern innovation</p>
+            <p style="margin-top: 1rem; opacity: 0.7;">
+                8 Billion EGP Investment • 250,000 Students • 12,000 Jobs • Global Impact
+            </p>
+            <p style="margin-top: 1rem; font-style: italic; color: var(--gold);">
+                "From Senenmut's stars to quantum computing - Egypt leads humanity forward"
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables
+        let scene, camera, renderer, globe, controls;
+        let hubs = [];
+        let isGlobeLoaded = false;
+
+        // Hub data with comprehensive information
+        const hubsData = [
+            {
+                name: "TAWASOL Egypt (Cairo)",
+                country: "Egypt",
+                lat: 30.0444,
+                lng: 31.2357,
+                type: "flagship",
+                description: "The flagship 8 billion EGP mega project pioneering life science innovation",
+                details: {
+                    investment: "8 Billion EGP",
+                    facilities: "500-bed hospital, Quantum computing center, Biobank facilities, Business incubators (50+ startups)",
+                    research_centers: "Genomics and Precision Medicine Center, Biomedical Engineering Hub, Agricultural Innovation Laboratory, Veterinary Sciences Institute, Environmental Sustainability Research Center",
+                    students: "250,000 active researchers across 5 specialized colleges",
+                    partnerships: "Cambridge Biomedical Campus, Singapore Biopolis, Research Triangle Park, Boston BioMedical Campus",
+                    ancient_connection: "Continues Senenmut's astronomical legacy through quantum computing and celestial mechanics research",
+                    sustainability: "100% renewable energy, carbon neutrality by 2030, circular economy principles",
+                    digital_nation: "Eight specialized ministries: Foreign Affairs, Treasury, Education, Health, Research, Broadcasting, Healthcare Hub, AI Platform"
+                }
+            },
+            {
+                name: "Cambridge Biomedical Campus",
+                country: "United Kingdom",
+                lat: 52.2053,
+                lng: 0.1218,
+                type: "partner",
+                description: "Leading European biomedical research hub and strategic partner",
+                details: {
+                    specialization: "Biomedical research and development, pharmaceutical innovation",
+                    collaboration: "Research methodology sharing, faculty exchange programs, joint degree programs",
+                    breakthrough: "Advanced therapeutics, drug discovery, clinical trial infrastructure",
+                    partnership_type: "Research collaboration model",
+                    contribution: "European gateway for TAWASOL's global research network"
+                }
+            },
+            {
+                name: "Singapore Biopolis",
+                country: "Singapore",
+                lat: 1.3521,
+                lng: 103.8198,
+                type: "partner",
+                description: "Asian innovation hub for biotechnology and life sciences",
+                details: {
+                    specialization: "Biotechnology innovation, commercialization, startup incubation",
+                    collaboration: "Asian market expansion, technology transfer, biotech scaling",
+                    breakthrough: "Biotech startup ecosystem, pharmaceutical manufacturing",
+                    partnership_type: "Asian innovation hub partnership",
+                    contribution: "Asia-Pacific gateway for TAWASOL's biotechnology initiatives"
+                }
+            },
+            {
+                name: "Research Triangle Park",
+                country: "United States",
+                lat: 35.8994,
+                lng: -78.8414,
+                type: "partner",
+                description: "Premier US research park focusing on industry-academia collaboration",
+                details: {
+                    specialization: "Industry-academia collaboration, technology commercialization",
+                    collaboration: "Startup development, corporate venture capital, licensing agreements",
+                    breakthrough: "Technology transfer programs, pharmaceutical manufacturing",
+                    partnership_type: "Industry-academia collaboration framework",
+                    contribution: "North American hub for TAWASOL's commercial partnerships"
+                }
+            },
+            {
+                name: "Boston BioMedical Campus",
+                country: "United States",
+                lat: 42.3601,
+                lng: -71.0589,
+                type: "partner",
+                description: "Advanced therapeutics and pharmaceutical research center",
+                details: {
+                    specialization: "Advanced therapeutics, drug development, human enzyme production",
+                    collaboration: "Joint research in biomedical drug manufacturing, clinical trials",
+                    breakthrough: "Human enzyme production capabilities, precision medicine",
+                    partnership_type: "Advanced therapeutics partnerships",
+                    contribution: "Specialized therapeutics expertise for TAWASOL's medical research"
+                }
+            }
+        ];
+
+        // Ancient Egyptian hieroglyphs for floating animation
+        const hieroglyphs = ['𓂀', '𓁹', '𓈖', '𓊪', '𓏏', '𓇯', '𓈗', '𓊨', '𓋴', '𓌻'];
+
+        // Initialize the application
+        function init() {
+            createFloatingHieroglyphs();
+            createParticles();
+            initGlobe();
+            setupEventListeners();
+            animateTimelineItems();
+            hideLoading();
+        }
+
+        // Create floating hieroglyphs background
+        function createFloatingHieroglyphs() {
+            const container = document.getElementById('hieroglyphsContainer');
+            
+            for (let i = 0; i < 20; i++) {
+                const hieroglyph = document.createElement('div');
+                hieroglyph.className = 'hieroglyph';
+                hieroglyph.textContent = hieroglyphs[Math.floor(Math.random() * hieroglyphs.length)];
+                hieroglyph.style.left = Math.random() * 100 + '%';
+                hieroglyph.style.animationDelay = Math.random() * 20 + 's';
+                hieroglyph.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(hieroglyph);
+            }
+        }
+
+        // Create particles background
+        function createParticles() {
+            const container = document.getElementById('particles');
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize Three.js globe
+        function initGlobe() {
+            const container = document.getElementById('globe-canvas');
+            
+            // Scene setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setClearColor(0x000000, 0);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // Controls - using a more compatible approach
+            if (typeof THREE.OrbitControls !== 'undefined') {
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+            } else {
+                // Fallback: basic mouse controls
+                console.log('OrbitControls not available, using basic controls');
+                controls = {
+                    enableDamping: true,
+                    dampingFactor: 0.05,
+                    enableZoom: true,
+                    autoRotate: true,
+                    autoRotateSpeed: 0.5,
+                    minDistance: 3,
+                    maxDistance: 10,
+                    update: function() {
+                        // Basic rotation fallback
+                        if (this.autoRotate) {
+                            camera.position.x = Math.cos(Date.now() * 0.0001) * 5;
+                            camera.position.z = Math.sin(Date.now() * 0.0001) * 5;
+                            camera.lookAt(0, 0, 0);
+                        }
+                    }
+                };
+            }
+
+            // Create Earth
+            createEarth();
+            
+            // Add enhanced lighting with sunlight effect
+            addEnhancedLighting();
+            
+            // Add hubs
+            addHubs();
+            
+            // Add starfield background
+            addStarfield();
+            
+            // Position camera
+            camera.position.set(0, 0, 5);
+            
+            // Start animation
+            animate();
+            
+            isGlobeLoaded = true;
+            
+            // Hide loading screen after globe is loaded
+            hideLoading();
+        }
+
+        function createEarth() {
+            const geometry = new THREE.SphereGeometry(2, 64, 64);
+            
+            // Load high-resolution Earth texture with fallback
+            const textureLoader = new THREE.TextureLoader();
+            
+            // Create earth material with realistic texture
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x4488bb, // Fallback blue color for Earth
+                shininess: 30,
+                transparent: false,
+                opacity: 1.0,
+                emissive: 0x001122,
+                emissiveIntensity: 0.05
+            });
+
+            // Try to load the texture, but don't fail if it doesn't work
+            textureLoader.load(
+                'https://res.cloudinary.com/dneamcgig/image/upload/v1751141633/m47pgox2ygxgdg5s6v5t.jpg',
+                function(texture) {
+                    // Success callback
+                    material.map = texture;
+                    material.needsUpdate = true;
+                    console.log('Earth texture loaded successfully');
+                },
+                function(progress) {
+                    // Progress callback
+                    console.log('Loading texture...', progress);
+                },
+                function(error) {
+                    // Error callback - use procedural Earth-like appearance
+                    console.log('Texture failed to load, using procedural Earth');
+                    material.color.setHex(0x2244aa);
+                    material.emissive.setHex(0x001133);
+                    material.emissiveIntensity = 0.1;
+                }
+            );
+            
+            globe = new THREE.Mesh(geometry, material);
+            globe.castShadow = true;
+            globe.receiveShadow = true;
+            scene.add(globe);
+
+            // Add atmosphere with enhanced glow
+            const atmosphereGeometry = new THREE.SphereGeometry(2.15, 64, 64);
+            const atmosphereMaterial = new THREE.MeshBasicMaterial({
+                color: 0x4488ff,
+                transparent: true,
+                opacity: 0.15,
+                side: THREE.BackSide
+            });
+            const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+            scene.add(atmosphere);
+
+            // Add outer glow
+            const glowGeometry = new THREE.SphereGeometry(2.3, 32, 32);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.05,
+                side: THREE.BackSide
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            scene.add(glow);
+        }
+
+        function addEnhancedLighting() {
+            // Sunlight (directional light) - enhanced
+            const sunlight = new THREE.DirectionalLight(0xffffff, 1.5);
+            sunlight.position.set(5, 3, 5);
+            sunlight.castShadow = true;
+            sunlight.shadow.mapSize.width = 2048;
+            sunlight.shadow.mapSize.height = 2048;
+            sunlight.shadow.camera.near = 0.5;
+            sunlight.shadow.camera.far = 50;
+            scene.add(sunlight);
+
+            // Ambient light for overall illumination
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+            scene.add(ambientLight);
+
+            // Golden rim light (representing ancient Egyptian sun worship)
+            const rimLight = new THREE.DirectionalLight(0xffd700, 0.8);
+            rimLight.position.set(-5, 0, -5);
+            scene.add(rimLight);
+
+            // Point light for additional warmth
+            const pointLight = new THREE.PointLight(0xffd700, 0.5, 100);
+            pointLight.position.set(0, 0, 10);
+            scene.add(pointLight);
+        }
+
+        function addStarfield() {
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.02,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            const starsVertices = [];
+            for (let i = 0; i < 10000; i++) {
+                const x = (Math.random() - 0.5) * 2000;
+                const y = (Math.random() - 0.5) * 2000;
+                const z = (Math.random() - 0.5) * 2000;
+                starsVertices.push(x, y, z);
+            }
+
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+            const starField = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(starField);
+        }
+
+        function addHubs() {
+            hubsData.forEach((hubData, index) => {
+                const hub = createHub(hubData);
+                hubs.push(hub);
+                scene.add(hub);
+            });
+        }
+
+        function createHub(hubData) {
+            const group = new THREE.Group();
+            
+            // Convert lat/lng to 3D coordinates
+            const phi = (90 - hubData.lat) * (Math.PI / 180);
+            const theta = (hubData.lng + 180) * (Math.PI / 180);
+            
+            const x = -(2.05 * Math.sin(phi) * Math.cos(theta));
+            const y = 2.05 * Math.cos(phi);
+            const z = 2.05 * Math.sin(phi) * Math.sin(theta);
+            
+            // Create hub marker with enhanced design
+            const geometry = hubData.type === 'flagship' ? 
+                new THREE.ConeGeometry(0.08, 0.2, 8) : 
+                new THREE.SphereGeometry(0.06, 16, 16);
+            
+            const material = new THREE.MeshPhongMaterial({
+                color: hubData.type === 'flagship' ? 0xffd700 : 0xff6b35,
+                emissive: hubData.type === 'flagship' ? 0x443300 : 0x441100,
+                emissiveIntensity: 0.3,
+                shininess: 100
+            });
+            
+            const marker = new THREE.Mesh(geometry, material);
+            marker.position.set(x, y, z);
+            marker.lookAt(0, 0, 0);
+            marker.userData = hubData;
+            marker.castShadow = true;
+            
+            // Add pulsing glow effect
+            const glowGeometry = new THREE.SphereGeometry(0.12, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: hubData.type === 'flagship' ? 0xffd700 : 0xff6b35,
+                transparent: true,
+                opacity: 0.2
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            glow.position.copy(marker.position);
+            
+            group.add(marker);
+            group.add(glow);
+            group.userData = hubData;
+            
+            return group;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (controls) {
+                controls.update();
+            }
+            
+            // Animate hub markers with enhanced effects
+            hubs.forEach((hub, index) => {
+                const marker = hub.children[0];
+                const glow = hub.children[1];
+                if (marker && glow) {
+                    const time = Date.now() * 0.001;
+                    const scale = 1 + Math.sin(time * 2 + index) * 0.3;
+                    marker.scale.setScalar(scale);
+                    
+                    // Animate glow
+                    const glowScale = 1 + Math.sin(time * 1.5 + index) * 0.5;
+                    glow.scale.setScalar(glowScale);
+                    glow.material.opacity = 0.1 + Math.sin(time * 3 + index) * 0.1;
+                }
+            });
+            
+            // Rotate globe slowly
+            if (globe) {
+                globe.rotation.y += 0.001;
+            }
+            
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            // Raycaster for hub clicking
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            
+            renderer.domElement.addEventListener('click', onHubClick);
+            
+            function onHubClick(event) {
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+                
+                raycaster.setFromCamera(mouse, camera);
+                
+                const intersects = raycaster.intersectObjects(scene.children, true);
+                
+                for (let intersect of intersects) {
+                    if (intersect.object.userData && intersect.object.userData.name) {
+                        showHubInfo(intersect.object.userData);
+                        break;
+                    }
+                }
+            }
+            
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Resize handler
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onWindowResize() {
+            if (camera && renderer) {
+                const container = document.getElementById('globe-canvas');
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+        }
+
+        function showHubInfo(hubData) {
+            const panel = document.getElementById('hubInfoPanel');
+            const content = document.getElementById('hubInfoContent');
+            
+            let detailsHtml = '';
+            if (hubData.details) {
+                for (const [key, value] of Object.entries(hubData.details)) {
+                    detailsHtml += `
+                        <div class="hub-detail">
+                            <h4>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h4>
+                            <p>${value}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Add website link and external data connections
+            let websiteLink = '';
+            let externalLinks = '';
+            
+            if (hubData.name.includes('TAWASOL')) {
+                websiteLink = `<a href="https://tawasol-egypt-platform-dvcvvr9uh-tawasolnow.vercel.app" target="_blank" class="hub-link">Visit TAWASOL Platform</a>`;
+                externalLinks = `
+                    <div class="hub-detail">
+                        <h4>Connected Platforms</h4>
+                        <p>
+                            <a href="https://preview--egypt-omics-uber.lovable.app/" target="_blank" class="hub-link">Egypt Omics Platform</a><br>
+                            <a href="https://dyh6i3c9o0ll.manus.space" target="_blank" class="hub-link">Telemedicine Hub</a><br>
+                            <a href="https://qjh9iec5vx5p.manus.space" target="_blank" class="hub-link">Research Assistant</a>
+                        </p>
+                    </div>
+                `;
+            } else if (hubData.name.includes('Cambridge')) {
+                websiteLink = `<a href="https://www.crick.ac.uk" target="_blank" class="hub-link">Visit Francis Crick Institute</a>`;
+            } else if (hubData.name.includes('Boston')) {
+                websiteLink = `<a href="https://www.broadinstitute.org" target="_blank" class="hub-link">Visit Broad Institute</a>`;
+            } else if (hubData.name.includes('Singapore')) {
+                websiteLink = `<a href="https://www.a-star.edu.sg/biopolis" target="_blank" class="hub-link">Visit Biopolis</a>`;
+            }
+            
+            content.innerHTML = `
+                <h3>${hubData.name}</h3>
+                <div class="hub-detail">
+                    <h4>Location</h4>
+                    <p>${hubData.country}</p>
+                </div>
+                <div class="hub-detail">
+                    <h4>Description</h4>
+                    <p>${hubData.description}</p>
+                </div>
+                ${detailsHtml}
+                ${externalLinks}
+                <div class="hub-actions">
+                    ${websiteLink}
+                </div>
+            `;
+            
+            panel.classList.add('active');
+        }
+
+        function closeHubInfo() {
+            const panel = document.getElementById('hubInfoPanel');
+            panel.classList.remove('active');
+        }
+
+        function animateTimelineItems() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.animationDelay = '0s';
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, index * 200);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                observer.observe(item);
+            });
+        }
+
+        function hideLoading() {
+            setTimeout(() => {
+                const loadingElement = document.getElementById('loading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                    console.log('Loading screen hidden successfully');
+                }
+            }, 500); // Reduced from 2000ms to 500ms for faster loading
+        }
+
+        // Initialize when page loads
+        let initCalled = false;
+        window.addEventListener('load', () => {
+            if (!initCalled) {
+                initCalled = true;
+                init();
+            }
+        });
+        
+        // Fallback initialization in case load event doesn't fire
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!initCalled) {
+                initCalled = true;
+                setTimeout(init, 100);
+            }
+        });
+
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://vrfyjirddfdnwuffzqhb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyZnlqaXJkZGZkbnd1ZmZ6cWhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDYwNjMsImV4cCI6MjA3NTQ4MjA2M30.glgJwI2yIqUFG8ZtWJk2esxGdXw6nFp5eQ8aANbRAvE';
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Example of how to use the client (e.g., fetching hub data from a 'hubs' table)
+        async function fetchHubData() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('hubs')
+                    .select('*');
+                if (error) throw error;
+                console.log('Fetched Hub Data from Supabase:', data);
+                // You would integrate this data into your globe visualization here
+            } catch (error) {
+                console.error('Error fetching hub data from Supabase:', error.message);
+            }
+        }
+        // fetchHubData(); // Uncomment to test fetching data on load
+    </script>
+</body>
 </html>
