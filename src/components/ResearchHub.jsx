@@ -1,36 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../utils/supabaseClient';
-import { ArrowLeft, BookOpen, TrendingUp, Users } from 'lucide-react';
+import React, { useState } from 'react';
 
 const ResearchHub = ({ onBack }) => {
-
-  const [m2m3Data, setM2m3Data] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    async function fetchM2m3Data() {
-      setLoading(true);
-      setError(null);
-      
-      // Assuming a table named 'm2m3_research' for the M2-3M system content
-      const { data, error } = await supabase
-        .from('m2m3_research')
-        .select('*')
-        .single(); // Assuming a single entry for the main Research Hub page
-
-      if (error) {
-        console.error('Supabase fetch error for M2-3M Research:', error);
-        setError(error.message);
-      } else {
-        setM2m3Data(data);
-      }
-      setLoading(false);
-    }
-
-    fetchM2m3Data();
-  }, []);
-
+  const [activeSection, setActiveSection] = useState('overview');
 
   const sections = [
     { id: 'overview', label: 'Research Overview', icon: '🔬' },
@@ -147,43 +118,6 @@ const ResearchHub = ({ onBack }) => {
                   to accelerate research and development processes.
                 </p>
               </div>
-            </div>
-
-            {/* M2-3M System Live Data Integration */}
-            <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 rounded-xl p-6 border border-yellow-400/50">
-              <h3 className="text-2xl font-semibold text-yellow-400 mb-4 flex items-center">
-                <TrendingUp className="w-6 h-6 mr-2" />
-                M2-3M System Live Data
-              </h3>
-              {loading ? (
-                <p className="text-gray-300">Connecting to M2-3M System...</p>
-              ) : error ? (
-                <p className="text-red-400">
-                  Connection Error: {error}. Displaying static content only.
-                </p>
-              ) : m2m3Data ? (
-                <div className="grid md:grid-cols-3 gap-4 text-gray-200">
-                  <div>
-                    <p className="text-xl font-bold text-yellow-300">{m2m3Data.total_active_projects || 'N/A'}</p>
-                    <p>Active Projects</p>
-                  </div>
-                  <div>
-                    <p className="text-xl font-bold text-yellow-300">{m2m3Data.collaborating_institutions || 'N/A'}</p>
-                    <p>Collaborating Institutions</p>
-                  </div>
-                  <div>
-                    <p className="text-xl font-bold text-yellow-300">{m2m3Data.latest_breakthrough || 'N/A'}</p>
-                    <p>Latest Breakthrough</p>
-                  </div>
-                  <p className="text-sm col-span-3 italic mt-2">
-                    Data last updated: {new Date(m2m3Data.updated_at).toLocaleString()}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-gray-300">
-                  No live data available from the M2-3M system at this moment.
-                </p>
-              )}
             </div>
 
             <div className="bg-gradient-to-r from-green-600/20 to-blue-600/20 rounded-xl p-6 border border-white/20">

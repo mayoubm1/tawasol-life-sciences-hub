@@ -1,18 +1,16 @@
 {
-  "name": "tawasol-lifescience-hub",
-  "version": "2.0.0",
-  "description": "Tawasol Life Sciences Hub - Interactive 3D Globe with 25 Global Research Hubs",
-  "main": "index.js",
+  "name": "tawasol-life-sciences-hub",
+  "private": true,
+  "version": "2.1.0",
+  "type": "module",
+  "description": "Interactive full-screen life sciences network centred on Egypt.",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "preview": "vite preview --host 0.0.0.0"
   },
-  "keywords": ["biotech", "research", "globe", "3d", "react"],
-  "author": "Tawasol Life Sciences",
-  "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-globe.gl": "^2.37.0",
@@ -20,7 +18,9 @@
     "three": "^0.181.2"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "tailwindcss": "^4.3.3",
     "vite": "^7.2.4"
   }
 }

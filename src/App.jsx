@@ -1,163 +1,229 @@
-import { useState, useRef, useEffect } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Globe from 'react-globe.gl';
-import EgyptHubDetails from './components/EgyptHubDetails';
-import HubInfoWindow from './components/HubInfoWindow';
+import { globalHubs } from './data/globalHubs';
+import Header from './components/Header';
+import HubInfoPanel from './components/HubInfoPanel';
 import AIAssistant from './components/AIAssistant';
+import EgyptHubPage from './components/EgyptHubPage';
+import LifeSciencesEducation from './components/LifeSciencesEducation';
+import ResearchHub from './components/ResearchHub';
+import InnovationLab from './components/InnovationLab';
+import TelemedicineHub from './components/TelemedicineHub';
+import { useRealtimeHubs } from './hooks/useRealtimeHubs';
 import './App.css';
 
-function GlobeComponent() {
-  const globeEl = useRef();
-  const [countries, setCountries] = useState({ features: [] });
-  const [hoverD, setHoverD] = useState();
-  const [activeHub, setActiveHub] = useState(null);
-  const [showChat, setShowChat] = useState(false);
-  const navigate = useNavigate();
-
-  const hubs = [
-    { lat: 30.0444, lng: 31.2357, name: 'Cairo, Egypt - Tawasol Life Science Hub', id: 'cairo', description: 'The central hub for life science and technology in Egypt, aligned with Vision 2030. Specializations: Genomics, Personalized Medicine, Medical Devices, Digital Health.' },
-    { lat: 42.3601, lng: -71.0589, name: 'Boston & Cambridge, USA', id: 'boston', description: 'Over 1,200 biotech companies, including Moderna, Biogen, and Vertex Pharmaceuticals. Kendall Square is known as \'the most innovative square mile on the planet\'. The region raised $7.89 billion in VC in 2024 and has led in NIH funding for 22 consecutive years. Specializations: Immunotherapy, Gene Therapy, Neuroscience, Oncology.' },
-    { lat: 37.7749, lng: -122.4194, name: 'San Francisco Bay Area, USA', id: 'sf', description: 'Home to over 200 biotech companies and major universities like Stanford and UC Berkeley. Known for strong VC investment and a culture of innovation in SaMDs, machine learning, and AI for health. Specializations: AI/ML in Healthcare, Digital Health, Precision Medicine.' },
-    { lat: 41.8781, lng: -87.6298, name: 'Chicago, USA', id: 'chicago', description: 'An emerging biotech hub with organizations like the Chan Zuckerberg Biohub and Fulton Labs. Benefits from a central location and talent from universities like the University of Chicago and Northwestern. Specializations: Biotech Manufacturing, Clinical Research, Infectious Diseases.' },
-    { lat: 34.0522, lng: -118.2437, name: 'Southern California, USA', id: 'socal', description: 'A rapidly emerging hub with strong investment ($60 billion in private investment in 2023). Home to renowned research institutions like UCSD and a diverse talent pool. Specializations: Medical Devices, Regenerative Medicine, Neurotechnology.' },
-    { lat: 47.6062, lng: -122.3321, name: 'Seattle, USA', id: 'seattle', description: 'A leader in immunology, cell therapy, and infectious diseases. Home to the University of Washington and the Fred Hutchinson Cancer Research Center, with a 25% increase in life sciences employment from 2019 to 2022. Specializations: Immunotherapy, Cell Therapy, Infectious Disease Research.' },
-    { lat: 39.9526, lng: -75.1652, name: 'Philadelphia, USA', id: 'philadelphia', description: 'A prominent hub with specialized strengths in cell and gene therapy. Features a collaborative ecosystem and significant infrastructure development, including a 1,300-acre life sciences hub in South Philly. Specializations: Gene Therapy, Cell Therapy, Regenerative Medicine.' },
-    { lat: 35.9132, lng: -79.0558, name: 'Research Triangle, USA', id: 'research_triangle', description: 'The 5th largest life sciences hub in the US, with over 600 companies and the world\'s largest cluster of CROs. Supported by Duke University, UNC-Chapel Hill, and NC State University. Specializations: CRO Services, Drug Development, Clinical Trials.' },
-    { lat: 51.5074, lng: -0.1278, name: 'London, UK', id: 'london', description: 'A major European financial and innovation hub with a growing life sciences sector. Home to leading institutions like UCL, Imperial College, and the Francis Crick Institute. Specializations: Genomics, Structural Biology, Cancer Research.' },
-    { lat: 35.6895, lng: 139.6917, name: 'Tokyo, Japan', id: 'tokyo', description: 'A hub for medical device innovation and pharmaceutical research in Asia. Strong focus on robotics in healthcare and regenerative medicine. Specializations: Medical Devices, Robotics in Healthcare, Regenerative Medicine.' },
-    { lat: 1.3521, lng: 103.8198, name: 'Singapore', id: 'singapore', description: 'A leading biotech cluster in Southeast Asia, known for its strong government support and research infrastructure. Home to A*STAR and major biomedical research institutes. Specializations: Precision Medicine, Infectious Disease Research, Translational Research.' },
-    { lat: 47.5596, lng: 7.5886, name: 'Basel Area, Switzerland', id: 'basel', description: 'A prominent European biotech cluster, home to major pharmaceutical companies like Novartis, Roche, and Syngenta. Strong R&D investment and innovation ecosystem. Specializations: Pharmaceuticals, Oncology, Immunology.' },
-    { lat: 46.5197, lng: 6.6323, name: 'Lausanne, Switzerland', id: 'lausanne', description: 'Features the Biopôle, fostering innovation in biotech and life sciences. Home to EPFL and leading research institutions. Specializations: Biotech Innovation, Translational Research, Bioengineering.' },
-    { lat: 47.3769, lng: 8.5417, name: 'Zurich, Switzerland', id: 'zurich', description: 'Known for its Technopark, fostering innovation in various high-tech sectors including life sciences. Strong pharmaceutical and biotech presence. Specializations: Pharmaceutical Research, Biotech Innovation, Digital Health.' },
-    { lat: 55.6761, lng: 12.5683, name: 'Copenhagen, Denmark', id: 'copenhagen', description: 'An important biotech hub in Northern Europe, home to major pharmaceutical and biotech companies like Novo Nordisk. Strong focus on diabetes and obesity research. Specializations: Diabetes Research, Obesity Treatment, Biopharmaceuticals.' },
-    { lat: 52.5200, lng: 13.4050, name: 'Berlin, Germany', id: 'berlin', description: 'A rapidly growing biotech hub with over 200 biotech companies. Strong startup ecosystem and government support for life sciences innovation. Specializations: Biotech Startups, Synthetic Biology, Digital Health.' },
-    { lat: 48.8566, lng: 2.3522, name: 'Paris, France', id: 'paris', description: 'A leading European life sciences hub with strong pharmaceutical and biotech sectors. Home to prestigious research institutions and innovation clusters. Specializations: Pharmaceutical Research, Immunotherapy, Personalized Medicine.' },
-    { lat: 40.4168, lng: -3.7038, name: 'Madrid, Spain', id: 'madrid', description: 'An emerging biotech hub with growing investment in life sciences. Strong focus on translational research and clinical development. Specializations: Clinical Development, Translational Research, Biotech Innovation.' },
-    { lat: 41.3851, lng: 2.1734, name: 'Barcelona, Spain', id: 'barcelona', description: 'A vibrant biotech and life sciences cluster with strong academic institutions and research centers. Growing investment in genomics and personalized medicine. Specializations: Genomics, Personalized Medicine, Biotech Innovation.' },
-    { lat: 45.4642, lng: 9.1900, name: 'Milan, Italy', id: 'milan', description: 'A growing life sciences hub with strong pharmaceutical and biotech presence. Focus on regenerative medicine and advanced therapies. Specializations: Regenerative Medicine, Advanced Therapies, Pharmaceutical Research.' },
-    { lat: -33.8688, lng: 151.2093, name: 'Sydney, Australia', id: 'sydney', description: 'A leading biotech hub in the Asia-Pacific region with strong government support and research institutions. Growing focus on medical devices and diagnostics. Specializations: Medical Devices, Diagnostics, Biotech Innovation.' },
-    { lat: -37.8136, lng: 144.9631, name: 'Melbourne, Australia', id: 'melbourne', description: 'A prominent Australian life sciences hub with strong pharmaceutical and biotech sectors. Home to leading research institutions and innovation clusters. Specializations: Immunotherapy, Regenerative Medicine, Biotech Research.' },
-    { lat: -34.6037, lng: -58.3816, name: 'Buenos Aires, Argentina', id: 'buenos_aires', description: 'An emerging Latin American biotech hub with growing investment in life sciences. Strong focus on translational research and pharmaceutical development. Specializations: Pharmaceutical Development, Translational Research, Biotech Innovation.' },
-    { lat: -23.5505, lng: -46.6333, name: 'São Paulo, Brazil', id: 'sao_paulo', description: 'The largest biotech hub in Latin America with strong pharmaceutical and biotech sectors. Growing investment in personalized medicine and digital health. Specializations: Personalized Medicine, Digital Health, Pharmaceutical Research.' },
-    { lat: 37.3382, lng: -121.8863, name: 'San Jose, USA', id: 'san_jose', description: 'A major tech and biotech hub in Silicon Valley with strong focus on AI/ML applications in healthcare and medical devices. Specializations: AI/ML Healthcare, Medical Devices, Digital Health Innovation.' },
-  ];
-
-  const cairoHub = hubs.find(hub => hub.id === 'cairo');
-  const arcsData = cairoHub ? hubs.filter(hub => hub.id !== 'cairo').map(hub => ({
-    startLat: cairoHub.lat,
-    startLng: cairoHub.lng,
-    endLat: hub.lat,
-    endLng: hub.lng,
-    color: [['#00FFFF'], ['#FFFF00'], ['#FFFFFF']][Math.floor(Math.random() * 3)],
-    dashLength: 0.1,
-    dashGap: 0.4,
-    dashAnimateTime: 1000,
-  })) : [];
-
-  useEffect(() => {
-    if (globeEl.current) {
-      globeEl.current.controls().autoRotate = true;
-      globeEl.current.controls().autoRotateSpeed = 0.5;
-    }
-    fetch('/ne_110m_admin_0_countries.geojson')
-      .then(res => res.json())
-      .then(setCountries)
-      .catch(err => console.error('Error loading countries:', err));
-  }, []);
-
-  const handleGlobeClick = ({ lat, lng }) => {
-    const clickedHub = hubs.find(hub => 
-      Math.abs(lat - hub.lat) < 1 && Math.abs(lng - hub.lng) < 1
-    );
-    if (clickedHub && clickedHub.name.includes('Egypt')) {
-      navigate('/egypt-hub-details');
-    } else if (clickedHub) {
-      setActiveHub(clickedHub);
-    }
-  };
-
-  const handleCloseInfoWindow = () => {
-    setActiveHub(null);
-  };
-
-  return (
-    <div className="globe-container">
-      <Globe
-        ref={globeEl}
-        globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-        backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-        hexPolygonsData={countries.features}
-        hexPolygonResolution={3}
-        hexPolygonMargin={0.7}
-        hexPolygonColor={({ properties: d }) =>
-          d === hoverD ? 'rgba(255,255,255, 0.8)' : 'rgba(255,255,255, 0.1)'
-        }
-        onHexPolygonHover={setHoverD}
-        onGlobeClick={handleGlobeClick}
-        labelsData={hubs}
-        labelLat={d => d.lat}
-        labelLng={d => d.lng}
-        labelText={d => d.name}
-        labelSize={0.8}
-        labelDotRadius={0.4}
-        labelColor={() => '#FFA500'}
-        arcsData={arcsData}
-        arcStartLat={d => d.startLat}
-        arcStartLng={d => d.startLng}
-        arcEndLat={d => d.endLat}
-        arcEndLng={d => d.endLng}
-        arcColor={d => d.color}
-        arcDashLength={d => d.dashLength}
-        arcDashGap={d => d.dashGap}
-        arcDashAnimateTime={d => d.dashAnimateTime}
-        arcStrokeWidth={2}
-      />
-      {activeHub && (
-        <HubInfoWindow hub={activeHub} onClose={handleCloseInfoWindow} />
-      )}
-      <button 
-        className="chat-button"
-        onClick={() => setShowChat(!showChat)}
-        title="Open HAYAT AI Assistant"
-      >
-        💬
-      </button>
-      {showChat && (
-        <div className="chat-container">
-          <AIAssistant onClose={() => setShowChat(false)} />
-        </div>
-      )}
-    </div>
-  );
-}
+const EARTH_TEXTURE = 'https://res.cloudinary.com/dneamcgig/image/upload/v1751127791/Picsart_25-06-28_19-22-26-663_rzywqe.png';
+const SPACE_VIDEO = 'https://res.cloudinary.com/dneamcgig/video/upload/v1751145035/VID-20250628-WA0042_j1hxla.mp4';
+const EGYPT_VIEW = { lat: 27.2, lng: 31.4, altitude: 1.72 };
 
 function App() {
-  return (
-    <div className="app">
-      <nav className="navbar">
-        <div className="navbar-brand">
-          <div className="brand-icon">T</div>
-          <div className="brand-text">
-            <div className="brand-title">Tawasol</div>
-            <div className="brand-subtitle">Life Sciences</div>
-            <div className="brand-desc">Global Technology Hub Network</div>
-          </div>
-        </div>
-        <div className="navbar-menu">
-          <button className="nav-item">About Life Sciences</button>
-          <button className="nav-item">Research Hub</button>
-          <button className="nav-item">Innovation Lab</button>
-          <button className="nav-item">Portfolio</button>
-          <button className="nav-item active">🌍 3D Globe</button>
-          <button className="nav-item">🗺️ 2D Map</button>
-        </div>
-      </nav>
+  const [selectedHub, setSelectedHub] = useState(null);
+  const [viewMode, setViewMode] = useState('globe');
+  const [currentPage, setCurrentPage] = useState('main');
+  const [showAI, setShowAI] = useState(false);
+  const [viewport, setViewport] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const globeRef = useRef();
+  const { hubs: networkHubs } = useRealtimeHubs(globalHubs);
 
-      <Routes>
-        <Route path="/" element={<GlobeComponent />} />
-        <Route path="/egypt-hub-details" element={<EgyptHubDetails />} />
-      </Routes>
+  const egyptHub = useMemo(
+    () => networkHubs.find((hub) => hub.id === 'egypt-tawasol'),
+    [networkHubs],
+  );
+
+  const arcs = useMemo(() => {
+    if (!egyptHub) return [];
+
+    return networkHubs
+      .filter((hub) => hub.id !== egyptHub.id)
+      .map((hub, index) => ({
+        id: `${egyptHub.id}-${hub.id}`,
+        startLat: egyptHub.coordinates[0],
+        startLng: egyptHub.coordinates[1],
+        endLat: hub.coordinates[0],
+        endLng: hub.coordinates[1],
+        color: index % 3 === 0 ? ['#ffd56a', '#55d9ff'] : ['#b88724', '#66b8ff'],
+        label: `Tawasol Egypt ↔ ${hub.name}`,
+      }));
+  }, [egyptHub, networkHubs]);
+
+  useEffect(() => {
+    const updateViewport = () => setViewport({ width: window.innerWidth, height: window.innerHeight });
+    window.addEventListener('resize', updateViewport);
+    return () => window.removeEventListener('resize', updateViewport);
+  }, []);
+
+  const configureGlobe = () => {
+    const controls = globeRef.current?.controls?.();
+    if (controls) {
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.42;
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+      controls.rotateSpeed = 0.58;
+      controls.zoomSpeed = 0.72;
+      controls.minDistance = 130;
+      controls.maxDistance = 900;
+    }
+    globeRef.current?.pointOfView?.(EGYPT_VIEW, 0);
+  };
+
+  useEffect(() => {
+    if (viewMode === 'globe') {
+      const frame = window.requestAnimationFrame(configureGlobe);
+      return () => window.cancelAnimationFrame(frame);
+    }
+    return undefined;
+  }, [viewMode]);
+
+  const handleHubClick = (hub) => {
+    if (hub.id === 'egypt-tawasol') {
+      setSelectedHub(null);
+      setCurrentPage('egypt-hub');
+      return;
+    }
+    setSelectedHub(hub);
+  };
+
+  const renderGlobe = () => (
+    <div className="globe-container" aria-label="Interactive global life sciences network">
+      <Globe
+        ref={globeRef}
+        width={viewport.width}
+        height={viewport.height}
+        onGlobeReady={configureGlobe}
+        globeImageUrl={EARTH_TEXTURE}
+        backgroundColor="rgba(0,0,0,0)"
+        atmosphereColor="#74c9ff"
+        atmosphereAltitude={0.16}
+        pointsData={networkHubs}
+        pointLat={(hub) => hub.coordinates[0]}
+        pointLng={(hub) => hub.coordinates[1]}
+        pointColor={(hub) => (hub.type === 'flagship' ? '#f6c85f' : '#3ec6ff')}
+        pointAltitude={(hub) => (hub.type === 'flagship' ? 0.14 : 0.055)}
+        pointRadius={(hub) => (hub.type === 'flagship' ? 0.9 : 0.42)}
+        pointResolution={18}
+        pointLabel={(hub) => `
+          <div class="hub-tooltip">
+            <span class="hub-tooltip__eyebrow">${hub.type === 'flagship' ? 'FLAGSHIP NETWORK NODE' : hub.region}</span>
+            <strong>${hub.name}</strong>
+            <span>${hub.location}</span>
+            <small>Click to explore</small>
+          </div>
+        `}
+        onPointClick={handleHubClick}
+        onPointHover={(hub) => {
+          document.body.style.cursor = hub ? 'pointer' : 'default';
+        }}
+        arcsData={arcs}
+        arcStartLat={(arc) => arc.startLat}
+        arcStartLng={(arc) => arc.startLng}
+        arcEndLat={(arc) => arc.endLat}
+        arcEndLng={(arc) => arc.endLng}
+        arcColor={(arc) => arc.color}
+        arcAltitude={0.34}
+        arcStroke={0.46}
+        arcDashLength={0.34}
+        arcDashGap={0.18}
+        arcDashAnimateTime={2400}
+        arcCurveResolution={72}
+        arcCircularResolution={8}
+        arcLabel={(arc) => arc.label}
+        ringsData={egyptHub ? [egyptHub] : []}
+        ringLat={(hub) => hub.coordinates[0]}
+        ringLng={(hub) => hub.coordinates[1]}
+        ringColor={() => ['#ffd56a', 'rgba(255,213,106,0)']}
+        ringMaxRadius={8}
+        ringPropagationSpeed={1.8}
+        ringRepeatPeriod={900}
+      />
     </div>
+  );
+
+  const renderMap = () => (
+    <section className="network-map" aria-label="Flat global hub map">
+      <div className="network-map__grid" />
+      <div className="network-map__heading">
+        <span>NETWORK OVERVIEW</span>
+        <h2>Egypt connecting life-sciences ecosystems</h2>
+      </div>
+      <div className="network-map__surface">
+        <img src={EARTH_TEXTURE} alt="World network overview" />
+        {networkHubs.map((hub) => {
+          const left = ((hub.coordinates[1] + 180) / 360) * 100;
+          const top = ((90 - hub.coordinates[0]) / 180) * 100;
+          return (
+            <button
+              key={hub.id}
+              type="button"
+              className={`map-marker ${hub.type === 'flagship' ? 'map-marker--flagship' : ''}`}
+              style={{ left: `${left}%`, top: `${top}%` }}
+              onClick={() => handleHubClick(hub)}
+              aria-label={`Explore ${hub.name}`}
+            >
+              <span />
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+
+  if (currentPage === 'egypt-hub') return <EgyptHubPage onBack={() => setCurrentPage('main')} />;
+  if (currentPage === 'education') return <LifeSciencesEducation onBack={() => setCurrentPage('main')} />;
+  if (currentPage === 'research') return <ResearchHub onBack={() => setCurrentPage('main')} />;
+  if (currentPage === 'innovation') return <InnovationLab onBack={() => setCurrentPage('main')} />;
+  if (currentPage === 'telemedicine') return <TelemedicineHub onBack={() => setCurrentPage('main')} />;
+
+  return (
+    <main className="network-stage">
+      <video className="background-video" autoPlay muted loop playsInline aria-hidden="true">
+        <source src={SPACE_VIDEO} type="video/mp4" />
+      </video>
+      <div className="space-wash" aria-hidden="true" />
+      <div className="star-field star-field--far" aria-hidden="true" />
+      <div className="star-field star-field--near" aria-hidden="true" />
+
+      <div className="header-overlay">
+        <Header
+          onEducationClick={() => setCurrentPage('education')}
+          onResearchClick={() => setCurrentPage('research')}
+          onInnovationClick={() => setCurrentPage('innovation')}
+          onTelemedicineClick={() => setCurrentPage('telemedicine')}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
+      </div>
+
+      {viewMode === 'globe' ? renderGlobe() : renderMap()}
+
+      <aside className="network-intro" aria-label="Tawasol network introduction">
+        <span className="network-intro__kicker">CAIRO · EGYPT</span>
+        <h1>Life sciences, connected.</h1>
+        <p>Explore Tawasol’s Egypt-centred network across Africa, Asia, Europe, and the Gulf.</p>
+        <div className="network-intro__stat"><strong>{networkHubs.length - 1}</strong><span>global collaboration nodes</span></div>
+      </aside>
+
+      <div className="network-legend" aria-hidden="true">
+        <span><i className="legend-dot legend-dot--egypt" /> Egypt flagship</span>
+        <span><i className="legend-dot" /> Partner hub</span>
+        <span><i className="legend-arc" /> Active knowledge flow</span>
+      </div>
+
+      <div className="content-overlay">
+        {selectedHub && <HubInfoPanel hub={selectedHub} onClose={() => setSelectedHub(null)} />}
+        {showAI && <AIAssistant onClose={() => setShowAI(false)} />}
+        <button
+          type="button"
+          onClick={() => setShowAI((isOpen) => !isOpen)}
+          className="ai-toggle"
+          aria-label={showAI ? 'Close Hayah assistant' : 'Open Hayah assistant'}
+        >
+          <span className="ai-toggle__pulse" />
+          <span className="ai-toggle__mark">ح</span>
+          <span className="ai-toggle__label">حياة</span>
+        </button>
+      </div>
+    </main>
   );
 }
 
